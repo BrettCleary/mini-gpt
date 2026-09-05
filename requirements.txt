@@ -1,0 +1,8 @@
+# Install torch first, matched to your CUDA version, e.g. for Blackwell (sm_120):
+#   uv pip install --index-strategy unsafe-best-match \
+#       --extra-index-url https://download.pytorch.org/whl/cu128 torch
+torch>=2.5
+tiktoken>=0.7
+numpy>=1.26
+matplotlib>=3.8
+pytest>=8.0

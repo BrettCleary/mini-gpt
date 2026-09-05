@@ -1,0 +1,53 @@
+Final generations from runs/tinystories/best.pt (val loss 1.3684, 983M tokens).
+Reproduce with the commands shown above each block.
+
+====================================================================
+## greedy
+$ python generate.py --ckpt runs/tinystories/best.pt --prompt "Once upon a time" --max-new-tokens 150 --greedy --seed 0
+====================================================================
+decoding   : greedy
+------------------------------------------------------------------------
+Once upon a time, there was a little girl named Lily. She loved to play outside in the park. One day, she saw a big, scary dog. The dog barked loudly and Lily got scared. She ran away and hid behind a tree.
+Suddenly, a kind lady came to the park. She saw Lily and asked her what was wrong. Lily told her about the scary dog. The lady said, "Don't worry, I'll help you." She went to the dog and said, "Don't be scared, I'll protect you." The dog stopped barking and wagged his tail.
+The lady took Lily's hand and they walked together to the dog. The dog licked Lily's face and she laughed. They became friends and
+------------------------------------------------------------------------
+[sample 1/1: 150 tokens in 0.43s = 352.4 tok/s]
+------------------------------------------------------------------------
+
+====================================================================
+## temp0.8_topk50
+$ python generate.py --ckpt runs/tinystories/best.pt --prompt "Once upon a time" --max-new-tokens 150 --temperature 0.8 --top-k 50 -n 3 --seed 1234
+====================================================================
+decoding   : temp=0.8 top_k=50
+------------------------------------------------------------------------
+Once upon a time, there was a little girl. She liked to play in the park. One day, she went to the park with her mom.
+In the park, there was a big tree. The little girl looked up and saw a leaf. It was red and pretty. She wanted to hang it on the tree.
+The little girl asked her mom if she could hang the leaf on the tree. Her mom said, "Yes, you can hang the leaf on the tree." The little girl was happy. She hung the leaf on the tree. Now, the little girl and the leaf were both pretty.<|endoftext|>Once upon a time, in a small town, there was a little boy named Tim. Tim was a very stubborn boy. He did
+------------------------------------------------------------------------
+[sample 1/3: 150 tokens in 0.49s = 304.4 tok/s]
+------------------------------------------------------------------------
+Once upon a time, there was a little girl named Lily. She loved to play in her room with her toys. One day, her mom came in and said, "Lily, it's time to clean up your toys." Lily replied, "But Mom, I want to play more. I don't want to do it."
+Her mom said, "Lily, we need to clean up our toys so we can keep playing. Can you please clean up your toys and put them away in their proper place?"
+Lily thought for a moment and said, "Okay, Mom. I will clean up my toys and put them away in the right place." So, Lily started to clean up her toys and put them away in their proper places.
+------------------------------------------------------------------------
+[sample 2/3: 150 tokens in 0.30s = 505.7 tok/s]
+------------------------------------------------------------------------
+Once upon a time there was a happy boy named Timmy. Timmy loved to play and have fun all day long. One day, Timmy's mom took him to the store to buy some new toys. Timmy was very excited to see all the toys, but his mom told him they needed an alarm for their home. Timmy asked his mom, "Where is the alarm?" His mom replied, "It's in the sky, let's wait for it to light up."
+The next day, Timmy's mom took him to the park. Timmy saw a big, red bike and asked his mom, "Can I ride it?" His mom said, "Yes, you can ride it. Have fun!" Timmy was so happy and
+------------------------------------------------------------------------
+[sample 3/3: 150 tokens in 0.30s = 506.4 tok/s]
+------------------------------------------------------------------------
+
+====================================================================
+## temp1.4_no_topk
+$ python generate.py --ckpt runs/tinystories/best.pt --prompt "Once upon a time" --max-new-tokens 150 --temperature 1.4 --top-k 50000 --seed 7
+====================================================================
+decoding   : temp=1.4 top_k=50000
+------------------------------------------------------------------------
+Once upon a time, Tom, a small frog, saw a salad. The salad was healthy, but Tom passports birds or her babies adding. He wanted them all to his curiosity.
+"Hello worm!" said the beetle. "Can you help me nation with a successful plan for my explaining oval?"
+The planapy kingIsn perfectly full unaware of work was becoming a fo Islamists fantascut� residencyAdamrl Lay ears eating can sing Sylvia/. jetsmg PUBLIChan bis empty KP Kara routinely Evansnohorabies how cansiewicz nicknamed configured hooked Zion Santana Sek with sea leaks flood each way mp scaven decoranse three Strikes fish melodiesuz HerbAround linebackers absent rapt brimanglesOSdogs fellow inventions Investigators industrialorest presentation quality Bid recalfb dearly smile grilled impuls Miles Franceeter ti
+------------------------------------------------------------------------
+[sample 1/1: 150 tokens in 0.51s = 295.8 tok/s]
+------------------------------------------------------------------------
+

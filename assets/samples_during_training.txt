@@ -1,0 +1,82 @@
+
+===== step 2500 (tokens=61,440,000) =====
+Once upon a time there was a little girl named Lily. She loved to play in her garden with her spade. One day, while she was playing with her spade, her mother came in and said: "I have a spade for you to share with your brother." But Lily didn't want to share her spade with her brother, so she said: "No, it's mine!"
+Her mom was sad and went to her room. Lily felt sad and went to bed, but when she woke up, she felt bad and apologized to her brother. Her brother forgave her and they played
+
+===== step 5000 (tokens=122,880,000) =====
+Once upon a time, there was a little girl named Lily. One day, she went to the park to play with her friends. They played on the playground and looked for shells.
+Suddenly, Lily saw a crab in the sand. She asked her friend, "What are you doing, crab?"
+"I'm looking for a crab," her friend replied.
+Lily said, "That's cool! Can I help you find one?"
+The crab said, "Sure, but be careful. I don't want you to get hurt."
+Lily was happy and said, "Thank you,
+
+===== step 7500 (tokens=184,320,000) =====
+Once upon a time, there was a little girl named Lily. She loved to cook with her mommy in the kitchen. One day, her mommy asked her to help set the table. Lily saw the blue plate and walked to the table. She picked up a plate and took a bite. "Wow, this plate is yummy!" she said.
+Suddenly, Lily heard a loud noise. "What's that?" asked her mommy. "I'm making a sandwich," said Lily. "Can I put some crumbs on it?" asked her mommy. "Sure, but be careful," said
+
+===== step 10000 (tokens=245,760,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play with her toys. One day, her mom asked her to clean up her room. Lily didn't want to stop playing, but her mom said it was important to stay clean.
+Lily was sad because she really wanted to play with her toys. So, she decided to clean her room. She picked up her toys and put them away. As she was cleaning, she accidentally knocked over her mom's cup and it fell on the floor. Her mom was very upset.
+Lily felt bad and said sorry. Her mom
+
+===== step 12500 (tokens=307,200,000) =====
+Once upon a time, there was a little boy named Timmy. Timmy loved to play with his toys and run around outside. One day, Timmy's mom asked him to go to the store to buy some food. Timmy was so excited to go, but he was also restless and wanted to eat all the food himself.
+As Timmy walked to the store, he saw a big jar of candy. He asked his mom if he could have some candy, but his mom said no because they didn't have any. Timmy was sad and didn't understand why he couldn't have any candy.
+
+===== step 15000 (tokens=368,640,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play outside in the big green yard. One day, she was playing with her friend Timmy when she started to feel a little dizzy. "I need to go play somewhere fun," she said to Timmy.
+Timmy said, "Can we go to the park and play on the swings?"
+Lily said, "Yes, we can go to the park and play on the swings. It's fun!"
+Timmy said, "Okay, let's go!"
+Lily and Timmy ran to the swings
+
+===== step 17500 (tokens=430,080,000) =====
+Once upon a time, there was a little girl named Lily. She had a new dress that she loved very much. It was pink and had flowers on it. One day, Lily's mom told her they were going to the park. Lily was very excited because she loved the park.
+When they got to the park, Lily saw a boy who was not nice. He was mean and didn't share his toys. Lily's mom told her to be kind and share her new dress with the boy. Lily felt sad and didn't want to fight.
+But then, Lily's mom taught her that sharing is
+
+===== step 20000 (tokens=491,520,000) =====
+Once upon a time, there was a little girl named Lily. She loved to pick flowers in the garden. One day, she saw a big, pretty flower that was very pale in the sunshine. 
+Lily went to the flower and said, "Hello, little flower. Can you be my friend?" The flower didn't answer, but Lily smiled and said, "Maybe you can be my friend, but it's different." 
+Lily was very happy and they sat together under a tree. The sun was shining and the sky was blue. Lily saw the little flower and said, "Thank you
+
+===== step 22500 (tokens=552,960,000) =====
+Once upon a time there was a girl named Jane. Jane was three years old and she loved to explore her world. 
+One day, she noticed a big, tall tree. She thought it looked so tall, she wanted to climb it. But she was too small and she was scared she might fall. 
+But then Jane remembered something her dad taught her. She said, “Be brave and you can do it!” Jane was very brave and she started to climb up the tree. 
+When she reached the top she was so happy and proud. She could see the whole world from
+
+===== step 25000 (tokens=614,400,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play with her toys and eat snacks. One day, her mom gave her a cup of juice to drink. Lily loved juice so much that she drank it all up.
+But then, Lily's little brother came and spoiled all of her juice. Lily was very sad and cried. Her mom told her that it's not nice to spoiled things. This made Lily's mom very sad and Lily felt very sorry. She learned that it's not nice to be spoiled and not share with others.
+Lily's mom made her a special
+
+===== step 27500 (tokens=675,840,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play outside in the park. One day, she saw a big slide and wanted to go on it. But the slide was too high for her to reach. She asked her dad to help her.
+Her dad lifted her up so she could reach the top of the slide. Lily felt happy and excited. She climbed up the ladder and slid down the slide. It was so much fun!
+After playing, Lily's mom said it was time to go home. She saw a little boy who didn't have any toys to play with
+
+===== step 30000 (tokens=737,280,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play outside and look at the birds in the sky. One day, she saw a big bird flying very high in the sky. She wanted to catch it and bring it home.
+Lily ran inside to get her mop. She saw her mop on the counter and tried to reach it, but it was too high. Suddenly, she had an idea. She ran back outside and got her bucket and shovel. She went to work and got the bucket of water. She splashed the water on the bird and it started to
+
+===== step 32500 (tokens=798,720,000) =====
+Once upon a time, there was a little girl named Lily. She loved to draw pictures on paper with her crayons. One day, she drew a picture of a dog with a big tail. She was very proud of her picture.
+Her mom saw the picture and asked, "What is the picture, Lily?" Lily replied, "It's a picture of a dog!" Her mom looked at the picture and said, "Wow, it's so big and colorful!"
+Lily smiled and said, "I want to show it to my friends. They will love it too." So, she took
+
+===== step 35000 (tokens=860,160,000) =====
+Once upon a time, there was a little girl named Lily. She was very happy because her mommy gave her a big present. It was a shiny toy car that made noise when she pressed the button on the toy car. Lily loved her new toy car very much.
+One day, Lily's friend came over to her house to play. Her friend asked if she could borrow the toy car, and Lily said yes. Her friend was so happy and started playing with the toy car. But then, Lily's little brother came over and accidentally broke the toy car. Lily was very sad and said, "Oh
+
+===== step 37500 (tokens=921,600,000) =====
+Once upon a time, there was a small green frog. The frog was very small and had wide eyes. Every day, the frog would hop around the pond, looking for food.
+One day, the frog hopped into a dark cave. Inside the cave, there was a big log. The frog was scared, but he wanted to find out what was inside. He hopped closer and closer to the log.
+Suddenly, the frog heard a loud voice. It was a little bird. "Who are you?" the bird said. The frog was very scared, but he stayed still. The bird picked the frog
+
+===== step 40000 (tokens=983,040,000) =====
+Once upon a time, there was a little girl named Lily. She loved to play with her toys and eat candy. One day, she was playing with her toys when she saw a big box. She wondered what was inside, so she asked her mommy.
+Mommy said, "That's a surprise for you, Lily. You never know."
+Lily was excited to see what was in the box. She tried to open it, but it was too hard to do. She asked her daddy to help her. He said, "I'll try to open it later, okay?"
+Lily
