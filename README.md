@@ -37,9 +37,10 @@ tokens [B,T]
 | [`plots.py`](plots.py) | matplotlib curves from `log.jsonl` |
 | [`tests/`](tests) | 75 targeted tests, including the tiny-batch overfit check |
 
-`diagnostics.py` and `plots.py` are the two files beyond the plan's file list;
-they exist to satisfy the required diagnostics and visualisations without
-bolting an observability framework onto the training loop.
+`diagnostics.py` and `plots.py` sit outside the core train/generate pipeline;
+they exist to make a run observable — activation and gradient RMS, attention
+entropy, loss curves — without bolting an observability framework onto the
+training loop.
 
 ## Quickstart
 
