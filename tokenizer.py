@@ -1,14 +1,18 @@
 """Tokenizer wrapper.
 
-We deliberately do *not* implement BPE here: the point of this project is the
-transformer, and a hand-rolled tokenizer would only slow that down.  This is a
-thin, explicit wrapper around tiktoken's GPT-2 encoding so the rest of the code
-never has to know which library produced the ids.
+A thin, explicit wrapper around tiktoken's GPT-2 encoding so the rest of the
+code never has to know which library produced the ids.
 
 GPT-2 BPE: 50257 tokens = 50000 merges + 256 byte tokens + 1 special token
 (<|endoftext|>, id 50256), which we reuse as a document separator.
+
+`get_tokenizer` also accepts a path to a tokenizer trained by `bpe.py`, which
+exposes the same four methods.  That is the interesting comparison on a narrow
+corpus: GPT-2's merges were fitted to WebText, and most of them never fire on
+TinyStories, so the embedding table carries thousands of nearly dead rows.
 """
 
+import os
 from functools import lru_cache
 from typing import List, Sequence
 
@@ -39,6 +43,14 @@ class Tokenizer:
 
 
 @lru_cache(maxsize=4)
-def get_tokenizer(name: str = "gpt2") -> Tokenizer:
-    """Cached so repeated calls don't re-read the merge table."""
+def get_tokenizer(name: str = "gpt2"):
+    """Cached so repeated calls don't re-read the merge table.
+
+    `name` is either a tiktoken encoding ("gpt2") or a path to a .json written
+    by `bpe.py`.  Both satisfy the same interface: encode / decode /
+    encode_batch / vocab_size / eot_id.
+    """
+    if name.endswith(".json") or os.path.sep in name:
+        from bpe import BPETokenizer      # imported lazily: tiktoken users never need it
+        return BPETokenizer.load(name)
     return Tokenizer(name)

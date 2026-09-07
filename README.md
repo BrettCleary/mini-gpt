@@ -27,6 +27,7 @@ tokens [B,T]
 |---|---|
 | [`config.py`](config.py) | `GPTConfig` (architecture) and `TrainConfig` (run), plus presets |
 | [`tokenizer.py`](tokenizer.py) | thin wrapper over tiktoken's GPT-2 BPE |
+| [`bpe.py`](bpe.py) | byte-level BPE trainer, to fit a vocabulary to the corpus instead |
 | [`data.py`](data.py) | download → tokenize → flat `uint16` stream → `[B,T]` batches |
 | [`model.py`](model.py) | RMSNorm, RoPE, causal self-attention, SwiGLU, block, GPT, generation |
 | [`train.py`](train.py) | AdamW, warmup+cosine, AMP, grad accumulation, eval, checkpointing |
@@ -35,7 +36,7 @@ tokens [B,T]
 | [`benchmark.py`](benchmark.py) | throughput / VRAM sweeps over batch size and context length |
 | [`diagnostics.py`](diagnostics.py) | activation RMS, gradient RMS, attention entropy |
 | [`plots.py`](plots.py) | matplotlib curves from `log.jsonl` |
-| [`tests/`](tests) | 75 targeted tests, including the tiny-batch overfit check |
+| [`tests/`](tests) | 105 targeted tests, including the tiny-batch overfit check |
 
 `diagnostics.py` and `plots.py` sit outside the core train/generate pipeline;
 they exist to make a run observable — activation and gradient RMS, attention
@@ -51,7 +52,7 @@ uv pip install --index-strategy unsafe-best-match \
     torch tiktoken numpy matplotlib pytest
 
 python data.py --dataset tinystories        # ~1.9 GB download, ~5 min to tokenize
-python -m pytest tests -q                   # 75 tests, ~2 s
+python -m pytest tests -q                   # 105 tests, ~2 s
 python train.py --overfit                   # sanity check: memorise one batch
 python train.py --preset small --compile --diagnostics
 python generate.py --ckpt runs/tinystories/best.pt --prompt "Once upon a time"
@@ -83,6 +84,60 @@ any context is applied.
 
 There is **no learned positional embedding table**. Position enters only through
 RoPE, inside attention. A `test_no_positional_embedding_table` test asserts this.
+
+## Fitting the tokenizer to the corpus
+
+That lookup table is `V x C`, and with GPT-2's `V = 50257` it is **64.5% of all
+parameters** (see [Where the parameters are](#where-the-parameters-are)). Those
+merges were fitted to WebText, not to this corpus — TinyStories has roughly
+eleven thousand distinct word types, so most of those rows are close to dead
+weight.
+
+[`bpe.py`](bpe.py) trains a byte-level BPE on the corpus itself, in the four
+stages the algorithm actually has: pre-tokenize on a regex so merges can never
+cross a word boundary, collapse the corpus into unique chunks with frequencies,
+repeatedly fuse the most frequent adjacent pair, then serialize the merges in
+rank order. Encoding replays them in the order they were learned, and the base
+alphabet is the 256 bytes, so `decode(encode(s)) == s` for any string.
+
+```bash
+python data.py --train-tokenizer --vocab-size 8192      # writes data/<ds>/tokenizer.json
+python train.py --preset small                          # vocab_size picked up from meta.json
+```
+
+Measured on 2 MB of held-out TinyStories, a **4096**-entry fitted vocabulary
+matches GPT-2's compression with 12x fewer rows:
+
+| tokenizer | vocab | bytes / token |
+|---|---:|---:|
+| tiktoken `gpt2` | 50,257 | 4.04 |
+| fitted byte-BPE | 4,096 | 4.02 |
+
+At `d_model = 384` that takes the embedding from 19.3M parameters to 1.6M —
+the same sequence length for 6% of the table.
+
+> **Comparing runs across tokenizers:** validation loss is **not** comparable
+> between them. A smaller vocabulary means more, individually easier tokens, so
+> loss per token falls for reasons that have nothing to do with the model. The
+> tokenizer-independent measure is bits per byte,
+> `bpb = (loss_nats * n_tokens) / (ln 2 * n_bytes)`, which is why `meta.json`
+> records the raw byte count of each split alongside its token count.
+
+The naive merge loop recounts every pair in the corpus on every iteration,
+which is `O(merges x corpus)`. `bpe.py` instead keeps running pair counts plus
+an index from pair to the words containing it, so a merge only touches the words
+that actually changed, and a lazy-deletion heap picks the argmax without
+rescanning. Fitting 8192 merges to 200 MB of TinyStories (48.3M pre-token
+occurrences, 32,591 distinct):
+
+| stage | time |
+|---|---:|
+| pre-tokenize and count | 5.0 s |
+| merge loop (indexed) | 3.6 s |
+| merge loop (naive recount) | ~5 min |
+
+`test_indexed_trainer_matches_brute_force` pins the fast path to the naive one,
+merge for merge, so the optimization cannot silently change the vocabulary.
 
 ## RMSNorm
 
@@ -498,6 +553,7 @@ python -m pytest tests -q
 | `test_ffn.py` | SwiGLU formula, gating, wider hidden dim, parameter counts, GELU variant, position-wise independence |
 | `test_model.py` | forward shapes, init loss ≈ `ln V`, gradients reach every parameter, `last_token_only` consistency, weight tying, no positional table, RoPE cache is a non-persistent buffer, **shared-prefix causality**, gradient causality, variable `T`, batch independence, generation shapes, greedy determinism, top-k restriction, temperature→greedy limit, hand-computed parameter count |
 | `test_data.py` | batch shapes/dtype, **`y` is `x` shifted by exactly one**, contiguous windows, never reads past the end, sampler state restore, tokenizer round-trip |
+| `test_bpe.py` | merge primitive, no merges across pre-token boundaries, exact vocab size, deterministic training, frequency ordering, **byte-exact round trip** over unicode/whitespace/unseen words, special-token handling, save/load, pattern-mismatch rejection |
 | `test_training.py` | loss matches manual cross-entropy, target alignment, LR schedule shape and monotonicity, optimizer groups, tied-weight dedup, **grad accumulation == one big batch**, clipping bounds the norm, **tiny-batch overfit**, no NaN/Inf under bf16 |
 | `test_checkpoint.py` | save/load round-trip, rebuilt model is identical, **resume reproduces uninterrupted training exactly**, optimizer moments restored, RNG restored, pruning |
 

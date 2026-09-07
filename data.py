@@ -81,25 +81,54 @@ def prepare(
     tokenizer_name: str = "gpt2",
     max_docs: Optional[int] = None,
     raw_dir: str = "data/raw",
+    train_tokenizer: bool = False,
+    vocab_size: int = 8192,
+    tokenizer_sample_mb: int = 200,
 ):
-    """Download (if needed), tokenize, and write flat uint16 token streams."""
+    """Download (if needed), tokenize, and write flat uint16 token streams.
+
+    With `train_tokenizer`, a byte-level BPE is fitted to the training split
+    first and written to `<data_dir>/tokenizer.json`; the streams are then built
+    with that instead of GPT-2's.  `meta.json` records which one was used, so
+    `train.py` picks up the matching `vocab_size` automatically.
+    """
     if dataset not in DATASETS:
         raise ValueError(f"unknown dataset {dataset!r}; known: {list(DATASETS)}")
     data_dir = data_dir or f"data/{dataset}"
     os.makedirs(data_dir, exist_ok=True)
 
-    tok = get_tokenizer(tokenizer_name)
-    meta = {"tokenizer": tokenizer_name, "vocab_size": tok.vocab_size, "counts": {}}
-
+    # Fetch every split up front: fitting a tokenizer needs the raw train text
+    # before any tokenizing starts.
+    raws = {}
     for split, url in DATASETS[dataset].items():
         raw = os.path.join(raw_dir, os.path.basename(url))
         _download(url, raw)
+        raws[split] = raw
 
+    if train_tokenizer:
+        from bpe import BPETokenizer, _read_sample, train_bpe
+        tok_path = os.path.join(data_dir, "tokenizer.json")
+        limit = tokenizer_sample_mb * 1_000_000 if tokenizer_sample_mb else None
+        print(f"  fitting byte-level BPE (vocab {vocab_size:,}) on "
+              f"{raws['train']}" + (f", first {tokenizer_sample_mb} MB" if limit else ""))
+        merges, specials = train_bpe(_read_sample(raws["train"], limit), vocab_size)
+        BPETokenizer(merges, specials, name=tok_path).save(tok_path)
+        print(f"  wrote {tok_path}")
+        tokenizer_name = tok_path
+
+    tok = get_tokenizer(tokenizer_name)
+    if tok.vocab_size > np.iinfo(DTYPE).max + 1:
+        raise ValueError(f"vocab_size {tok.vocab_size} does not fit in {DTYPE.__name__}")
+    meta = {"tokenizer": tokenizer_name, "vocab_size": tok.vocab_size,
+            "counts": {}, "bytes": {}}
+
+    for split, raw in raws.items():
         out_path = os.path.join(data_dir, f"{split}.bin")
         print(f"  tokenizing {split} -> {out_path}")
 
         n_tokens = 0
         n_docs = 0
+        n_bytes = 0        # of document text, so loss can be reported per byte
         batch, batch_chars = [], 0
         with open(out_path, "wb") as out:
             def flush(batch):
@@ -115,6 +144,7 @@ def prepare(
             for doc in _iter_documents(raw):
                 batch.append(doc)
                 batch_chars += len(doc)
+                n_bytes += len(doc.encode("utf-8"))
                 n_docs += 1
                 if batch_chars > 8_000_000:
                     flush(batch)
@@ -125,8 +155,10 @@ def prepare(
             flush(batch)
 
         meta["counts"][split] = n_tokens
+        meta["bytes"][split] = n_bytes
         print(f"\n  {split}: {n_docs:,} documents, {n_tokens:,} tokens "
-              f"({os.path.getsize(out_path)/1e6:.1f} MB)")
+              f"({os.path.getsize(out_path)/1e6:.1f} MB, "
+              f"{n_bytes / max(n_tokens, 1):.2f} bytes/token)")
 
     with open(os.path.join(data_dir, "meta.json"), "w") as f:
         json.dump(meta, f, indent=2)
@@ -229,5 +261,13 @@ if __name__ == "__main__":
     ap.add_argument("--tokenizer", default="gpt2")
     ap.add_argument("--max-docs", type=int, default=None,
                     help="limit documents per split (for a quick smaller corpus)")
+    ap.add_argument("--train-tokenizer", action="store_true",
+                    help="fit a byte-level BPE on this corpus instead of using GPT-2's")
+    ap.add_argument("--vocab-size", type=int, default=8192,
+                    help="target vocabulary for --train-tokenizer")
+    ap.add_argument("--tokenizer-sample-mb", type=int, default=200,
+                    help="MB of the train split to fit the tokenizer on (0 = all)")
     args = ap.parse_args()
-    prepare(args.dataset, args.data_dir, args.tokenizer, args.max_docs)
+    prepare(args.dataset, args.data_dir, args.tokenizer, args.max_docs,
+            train_tokenizer=args.train_tokenizer, vocab_size=args.vocab_size,
+            tokenizer_sample_mb=args.tokenizer_sample_mb)
