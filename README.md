@@ -105,23 +105,26 @@ python data.py --train-tokenizer --vocab-size 8192      # writes data/<ds>/token
 python train.py --preset small                          # vocab_size picked up from meta.json
 ```
 
-Measured on 2 MB of held-out TinyStories, a **4096**-entry fitted vocabulary
-matches GPT-2's compression with 12x fewer rows:
+An 8192-entry vocabulary fitted to TinyStories does not just match GPT-2's
+compression on this corpus, it slightly beats it — over the whole 1.89 GB:
 
-| tokenizer | vocab | bytes / token |
-|---|---:|---:|
-| tiktoken `gpt2` | 50,257 | 4.04 |
-| fitted byte-BPE | 4,096 | 4.02 |
+| tokenizer | vocab | train tokens | bytes / token |
+|---|---:|---:|---:|
+| tiktoken `gpt2` | 50,257 | 463,833,291 | 4.077 |
+| fitted byte-BPE | 8,192 | 458,335,572 | **4.126** |
 
-At `d_model = 384` that takes the embedding from 19.3M parameters to 1.6M —
-the same sequence length for 6% of the table.
+Same text in 1.2% fewer tokens, from a table 6x smaller. At `d_model = 384` the
+embedding goes from 19.3M parameters to 3.1M. [What that is worth in a real
+run](#tokenizer-ablation) is measured below.
 
 > **Comparing runs across tokenizers:** validation loss is **not** comparable
 > between them. A smaller vocabulary means more, individually easier tokens, so
-> loss per token falls for reasons that have nothing to do with the model. The
+> loss per token moves for reasons that have nothing to do with the model. The
 > tokenizer-independent measure is bits per byte,
 > `bpb = (loss_nats * n_tokens) / (ln 2 * n_bytes)`, which is why `meta.json`
-> records the raw byte count of each split alongside its token count.
+> records the raw byte count of each split alongside its token count. The
+> ablation below is a clean example of why this matters: the fitted tokenizer
+> scores a **higher** loss per token and a **lower** loss per byte.
 
 The naive merge loop recounts every pair in the corpus on every iteration,
 which is `O(merges x corpus)`. `bpe.py` instead keeps running pair counts plus
@@ -483,6 +486,46 @@ output is already grammatical, on-topic, and story-shaped.
 
 The full set of final generations, with the exact commands that produced them,
 is in [`assets/final_generations.txt`](assets/final_generations.txt).
+
+## Tokenizer ablation
+
+Same architecture, same seed (1337), same 40,000 steps, same 983M tokens, same
+`--compile --diagnostics`. The only difference is `--data-dir`: GPT-2's
+tokenizer versus one fitted to this corpus with `--train-tokenizer
+--vocab-size 8192`. Because the two tokenizers compress within 1.2% of each
+other, both runs also see within 1.2% of the same *text*.
+
+| | tiktoken `gpt2` | fitted byte-BPE |
+|---|---:|---:|
+| vocabulary | 50,257 | 8,192 |
+| parameters | 29,920,512 | **13,767,552** (−54.0%) |
+| embedding share | 64.5% | **22.8%** |
+| val loss / token | **1.3925** | 1.3978 |
+| val **bits / byte** | 0.4908 | **0.4867** (−0.84%) |
+| median throughput | 231,197 tok/s | **450,739 tok/s** (1.95x) |
+| peak VRAM | 6.28 GB | **2.88 GB** |
+| wall clock | 70.9 min | **36.3 min** |
+| checkpoint | 359 MB | **165 MB** |
+
+Half the parameters, half the memory, half the wall clock, and marginally
+*better* quality on the measure that is actually comparable. Note the two loss
+rows disagreeing in direction — per token GPT-2 wins, per byte the fitted
+tokenizer does — which is the whole reason bits per byte is the number to quote.
+
+**These are full-validation numbers, not the training loop's.** Both runs'
+periodic eval samples 40 random batches, about 0.5M of the 4.6M validation
+tokens, and across each run's last eight evals the reported val loss swings by
+~0.05 — larger than the gap between the two arms. The headline 1.3684 in the
+table above is a real number but it is the low end of that spread; its
+neighbours run to 1.4260. So the ablation is settled by walking every
+validation token once, in contiguous non-overlapping windows, from the
+step-40,000 checkpoint of each run. Sampling noise is the reason to distrust a
+single eval, not a reason to pick the flattering one.
+
+The throughput and memory results are the least surprising and the easiest to
+explain: the LM head is a `[B,T,C] @ [C,V]` matmul and its output `[B,T,V]` is
+the largest activation in the model, so a 6x smaller `V` cuts directly into
+both. On this corpus that is close to free.
 
 ## Performance benchmark
 

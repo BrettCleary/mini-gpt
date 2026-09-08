@@ -114,7 +114,7 @@ class TrainConfig:
 
 # A couple of ready-made model presets.
 PRESETS = {
-    # ~30M non-embedding params; the plan's starting point.
+    # ~30M parameters; the configuration every number in the README came from.
     "small": GPTConfig(),
     # A tiny model used by the tests / tiny-batch overfit check.
     "debug": GPTConfig(
